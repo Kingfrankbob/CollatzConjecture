@@ -32,7 +32,7 @@ namespace CollatzConjecture
                     continue;
 
                 double prevX = 000;
-                double prevY = 000;
+                double prevY = -4000;
 
                 double rotationAngle = 0;
 
