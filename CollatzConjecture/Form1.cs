@@ -1,15 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Text;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows;
 
 namespace CollatzConjecture
 {
@@ -39,8 +31,8 @@ namespace CollatzConjecture
                 if (pointsList.Count == 0)
                     continue;
 
-                double prevX = 0000;
-                double prevY = -4000;
+                double prevX = 000;
+                double prevY = 000;
 
                 double rotationAngle = 0;
 
