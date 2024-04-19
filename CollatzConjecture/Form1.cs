@@ -15,7 +15,8 @@ namespace CollatzConjecture
 {
     public partial class Form1 : Form
     {
-        private const int ITERATIONS = 50;
+        private const int ITERATIONS = 1000;
+        private const int ANGLE = 8;
         private List<List<int>> pointsDict = new List<List<int>>();
         private int step = 0;
         public Form1()
@@ -31,64 +32,6 @@ namespace CollatzConjecture
             collatzBox.Paint += collatzBox_Paint;
         }
 
-        private List<int> Collatz(int n)
-        {
-            var pointsList = new List<int>();
-            while (n != 1)
-            {
-                if (n % 2 == 0)
-                {
-                    n /= 2;
-                    pointsList.Add(n);
-                }
-                else
-                {
-                    n = 3 * n + 1;
-                    pointsList.Add(n);
-                }
-            }
-            pointsList.Reverse();
-            return pointsList;
-        }
-
-        //private void collatzBox_Paint(object sender, PaintEventArgs e)
-        //{
-        //    foreach (var pointsList in pointsDict)
-        //    {
-        //        if (pointsList.Count == 0)
-        //            continue;
-        //        var prevX = 10;
-        //        var prevY = 10;
-
-        //        double rotationAngle = 0;
-
-        //        for (int j = 0; j < Math.Min(step, pointsList.Count - 1); j++)
-        //        {
-        //            int x2 = prevX;
-        //            int y2 = prevY;
-
-        //            if (pointsList[j] % 2 == 0)
-        //            {
-        //                rotationAngle = 8; // 8 degrees in radians
-        //            }
-        //            else
-        //            {
-        //                rotationAngle = -8; // 8 degrees in radians
-        //            }
-
-        //            RotateAndMoveForward(ref prevX, ref prevY, rotationAngle, 1); // Adjust the distance as needed
-
-        //            var rand = new Random();
-        //            Color randomColor = Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256));
-
-        //            textBox1.Text = $"X: {prevX}, Y: {prevY}, Rot. Angle: {rotationAngle}, X2: {x2}, Y2: {y2}";
-
-        //            e.Graphics.DrawLine(new Pen(Color.Black), prevX * 2, prevY * 2, x2 * 2, y2 * 2);
-        //            e.Graphics.DrawEllipse(new Pen(randomColor), prevX * 2, prevY * 2, 2, 2);
-        //        }
-        //    }
-        //}
-
         private void collatzBox_Paint(object sender, PaintEventArgs e)
         {
             foreach (var pointsList in pointsDict)
@@ -96,58 +39,78 @@ namespace CollatzConjecture
                 if (pointsList.Count == 0)
                     continue;
 
-                var prevX = collatzBox.Width / 2; // Start from the bottom middle
-                var prevY = collatzBox.Height - 10;
+                double prevX = 0000;
+                double prevY = -4000;
 
                 double rotationAngle = 0;
 
                 for (int j = 0; j < Math.Min(step, pointsList.Count - 1); j++)
                 {
-                    int x2 = prevX;
-                    int y2 = prevY;
+                    double x2 = prevX;
+                    double y2 = prevY;
 
-                    // Determine rotation angle based on even or odd
-                    rotationAngle = (pointsList[j] % 2 == 0) ? 8 : -8;
+                    rotationAngle = (pointsList[j] % 2 == 0) ? rotationAngle += ANGLE : rotationAngle -= ANGLE;
 
-                    // Rotate and move the point forward
-                    RotateAndMoveForward(ref prevX, ref prevY, rotationAngle, 20); // Adjust the distance as needed
+                    RotateAndMoveForward(ref x2, ref y2, rotationAngle, 200);
 
-                    // Draw line and point
-                    e.Graphics.DrawLine(Pens.Black, x2, y2, prevX, prevY);
-                    e.Graphics.DrawEllipse(Pens.Red, prevX - 1, prevY - 1, 2, 2);
+                    //Console.WriteLine($"Prev X: {prevX} Prev Y: {prevY} X2: {x2} Y2: {y2} step: {step} point: {pointsList[j]}");
+
+                    float prevXMapped = Map((float)prevX, -5000, 5000, 0, collatzBox.Width);
+                    float prevYMapped = Map((float)prevY, -5000, 5000, 0, collatzBox.Height);
+                    float x2Mapped = Map((float)x2, -5000, 5000, 0, collatzBox.Width);
+                    float y2Mapped = Map((float)y2, -5000, 5000, 0, collatzBox.Height);
+
+                    e.Graphics.DrawLine(Pens.Black, x2Mapped, y2Mapped, prevXMapped, prevYMapped);
+                    //e.Graphics.DrawEllipse(Pens.Red, prevXMapped - 1, prevYMapped - 1, 2, 2);
+
+                    prevX = x2;
+                    prevY = y2;
                 }
             }
         }
 
-
-
-        private static void RotateAndMoveForward(ref int x, ref int y, double angle, int distance)
+        private static float Map(float value, float fromSource, float toSource, float fromTarget, float toTarget)
         {
-            double angleDegrees = angle * 180 / Math.PI;
-
-            double newX = x * Math.Cos(angle) - y * Math.Sin(angle);
-            double newY = x * Math.Sin(angle) + y * Math.Cos(angle);
-
-            x = (int)(newX + distance * Math.Cos(angle));
-            y = (int)(newY + distance * Math.Sin(angle));
+            return (value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget;
         }
 
+        private static void RotateAndMoveForward(ref double x, ref double y, double angle, int distance)
+        {
+            double angleRadians = angle * Math.PI / 180; // Convert degrees to radians
 
-        //private static void RotateAndMoveForward(ref int x, ref int y, double angle, int distance)
-        //{
-        //    // Rotate the point around the origin
-        //    double newX = x * Math.Cos(angle) - y * Math.Sin(angle);
-        //    double newY = x * Math.Sin(angle) + y * Math.Cos(angle);
+            double deltaX = distance * Math.Cos(angleRadians);
+            double deltaY = distance * Math.Sin(angleRadians);
 
-        //    // Move the rotated point forward
-        //    x = (int)(newX + distance * Math.Cos(angle));
-        //    y = (int)(newY + distance * Math.Sin(angle));
-        //}
+            double newX = x + deltaX;
+            double newY = y + deltaY;
 
+            x = newX;
+            y = newY;
+        }
+
+        private static List<int> Collatz(int n)
+        {
+            var pointsList = new List<int>();
+            while (n != 1)
+            {
+                pointsList.Add(n);
+                if (n % 2 == 0)
+                {
+                    n /= 2;
+                }
+                else
+                {
+                    n = 3 * n + 1;
+                }
+            }
+            pointsList.Add(n);
+            pointsList.Reverse();
+            return pointsList;
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            for (int i = 1; i <= ITERATIONS; i++)
+            for (int i = 5; i <= ITERATIONS; i++)
             {
                 var pointsList = Collatz(i);
                 pointsDict.Add(pointsList);
