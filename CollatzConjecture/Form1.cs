@@ -7,7 +7,7 @@ namespace CollatzConjecture
 {
     public partial class Form1 : Form
     {
-        private const int ITERATIONS = 1000;
+        private const int ITERATIONS = 2500;
         private const int ANGLE = 8;
         private List<List<int>> pointsDict = new List<List<int>>();
         private int step = 0;
